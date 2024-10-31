@@ -17,3 +17,8 @@ tasks:
     desc: Check lint.
     cmds:
       - pre-commit run --all-files
+
+  test:
+    desc: Run tests.
+    cmds:
+      - cargo test

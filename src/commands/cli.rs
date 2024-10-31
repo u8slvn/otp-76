@@ -11,12 +11,14 @@ pub struct Cli {
 #[derive(Subcommand, Debug)]
 enum Commands {
     Exec(super::exec::Cli),
+    GenerateKeypad(super::generate_keypad::Cli),
 }
 
 impl Cli {
     pub fn exec(&self) -> Result<()> {
         match &self.command {
             Commands::Exec(cli) => cli.exec(),
+            Commands::GenerateKeypad(cli) => cli.generate_keypad(),
         }
     }
 }
