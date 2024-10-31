@@ -29,6 +29,6 @@ mod tests {
         let key = generator.get_random_key();
 
         assert!((RandomKeyGenerator::MIN..RandomKeyGenerator::MAX).contains(&key));
-        assert_eq!(key.to_string().len(), 5);
+        assert_ne!(key, generator.get_random_key());
     }
 }
