@@ -1,4 +1,4 @@
-use crate::otp::pad::RandomKeyGenerator;
+use crate::otp::pad::PadGenerator;
 use anyhow::Result;
 use clap::Args;
 
@@ -8,11 +8,11 @@ pub struct Cli {}
 
 impl Cli {
     pub fn create_pads(&self) -> Result<()> {
-        let mut generator = RandomKeyGenerator::new();
+        let mut generator = PadGenerator::new();
 
-        let numbers: Vec<u32> = (0..20).map(|_| generator.get_random_key()).collect();
+        let pad = generator.generate_pad(20);
 
-        println!("{:?}", numbers);
+        println!("Generated pad with id: {}", pad.get_id());
         Ok(())
     }
 }
