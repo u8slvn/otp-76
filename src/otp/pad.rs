@@ -4,6 +4,7 @@
 
 use rand::rngs::OsRng;
 use rand::Rng;
+use std::fmt;
 
 #[derive(Debug)]
 pub enum KeyPadError {
@@ -32,6 +33,15 @@ impl Pad {
 
     pub fn len(&self) -> usize {
         self.keys.len()
+    }
+}
+
+impl fmt::Debug for Pad {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Pad")
+            .field("id", &self.get_id())
+            .field("keys", &self.keys)
+            .finish()
     }
 }
 
@@ -81,6 +91,19 @@ impl PadCollection {
     pub fn delete_pad(&mut self, id: u32) {
         self.pads.retain(|pad| pad.get_id() != id);
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.pads.is_empty()
+    }
+}
+
+impl fmt::Debug for PadCollection {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("PadCollection")
+            .field("count", &self.pads.len())
+            .field("pads", &self.pads)
+            .finish()
+    }
 }
 
 #[cfg(test)]
@@ -123,6 +146,8 @@ mod tests {
 
         collection.add_pad(pad);
 
+        assert!(!collection.is_empty());
+
         let pad = collection.get_pad(1).unwrap();
 
         assert_eq!(pad.get_id(), 1);
@@ -130,5 +155,6 @@ mod tests {
         collection.delete_pad(1);
 
         assert!(collection.get_pad(1).is_none());
+        assert!(collection.is_empty());
     }
 }
