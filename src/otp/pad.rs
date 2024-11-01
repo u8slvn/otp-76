@@ -15,14 +15,10 @@ pub struct Pad {
 }
 
 impl Pad {
-    pub fn new(id: &str, keys: Vec<u8>) -> Result<Self, &'static str> {
-        if keys.is_empty() || keys.len() < 5 {
-            Err("Keys cannot be empty or less than 5")
-        } else {
-            Ok(Self {
-                id: id.to_string(),
-                keys,
-            })
+    pub fn new(id: &str, keys: Vec<u8>) -> Self {
+        Self {
+            id: id.to_string(),
+            keys,
         }
     }
 
@@ -52,25 +48,26 @@ pub struct PadGenerator {
 }
 
 impl PadGenerator {
+    const KEY_SIZE: u8 = 5;
     const MIN_KEY: u8 = 0;
     const MAX_KEY: u8 = 10;
     const MIN_ID: u32 = 10000;
     const MAX_ID: u32 = 99999;
-    const KEY_SIZE: u8 = 5;
 
     pub fn new() -> Self {
         Self { rng: OsRng }
     }
 
-    pub fn generate_pad(&mut self, nb_keys: u8) -> Result<Pad, &'static str> {
+    pub fn generate_pad(&mut self, nb_keys: u8) -> Pad {
         let id = self.rng.gen_range(Self::MIN_ID..Self::MAX_ID).to_string();
         let keys = (0..nb_keys * Self::KEY_SIZE)
             .map(|_| self.rng.gen_range(Self::MIN_KEY..Self::MAX_KEY))
             .collect();
+
         Pad::new(&id, keys)
     }
 
-    pub fn generate_pads(&mut self, nb_pads: u8, nb_keys: u8) -> Result<Vec<Pad>, &'static str> {
+    pub fn generate_pads(&mut self, nb_pads: u8, nb_keys: u8) -> Vec<Pad> {
         (0..nb_pads).map(|_| self.generate_pad(nb_keys)).collect()
     }
 }
@@ -117,26 +114,17 @@ mod tests {
     fn test_pad_creation() {
         let id = "12345";
         let keys = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        let pad = Pad::new(id, keys).unwrap();
+        let pad = Pad::new(id, keys);
 
         assert_eq!(pad.get_id(), "12345");
         assert_eq!(pad.len(), 10);
     }
 
     #[test]
-    fn test_pad_creation_with_empty_keys() {
-        let id = "12345";
-        let keys = vec![];
-        let pad = Pad::new(id, keys);
-
-        assert!(pad.is_err());
-    }
-
-    #[test]
     fn test_pad_generation() {
         let mut generator = PadGenerator::new();
 
-        let pad = generator.generate_pad(5).unwrap();
+        let pad = generator.generate_pad(5);
 
         assert_eq!(pad.len(), 25);
     }
@@ -145,7 +133,7 @@ mod tests {
     fn test_pads_generation() {
         let mut generator = PadGenerator::new();
 
-        let pads = generator.generate_pads(2, 5).unwrap();
+        let pads = generator.generate_pads(2, 5);
 
         assert_eq!(pads.len(), 2);
         assert_eq!(pads[0].len(), 25);
@@ -154,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_pad_collection() {
-        let pad1 = Pad::new("12345", vec![1, 2, 3, 4, 5]).unwrap();
+        let pad1 = Pad::new("12345", vec![1, 2, 3, 4, 5]);
         let mut collection = PadCollection::new(vec![pad1]);
 
         assert!(!collection.is_empty());
