@@ -60,11 +60,11 @@ impl PadGenerator {
         Self { rng: OsRng }
     }
 
-    pub fn generate_pad(&mut self, nb_keys: usize) -> Pad {
+    pub fn generate_pad(&mut self, nb_keys: u8) -> Result<Pad, KeyPadError> {
         let keys = (0..nb_keys)
             .map(|_| self.rng.gen_range(Self::MIN..Self::MAX))
             .collect();
-        Pad::new(keys).unwrap()
+        Pad::new(keys)
     }
 }
 
@@ -131,7 +131,7 @@ mod tests {
     fn test_pad_generator() {
         let mut generator = PadGenerator::new();
 
-        let pad = generator.generate_pad(5);
+        let pad = generator.generate_pad(5).unwrap();
 
         assert_eq!(pad.len(), 5);
         assert!((PadGenerator::MIN..PadGenerator::MAX).contains(&pad.get_id()));

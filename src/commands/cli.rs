@@ -10,13 +10,13 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    GenerateKeypad(super::create_pads::Cli),
+    CreatePads(super::create_pads::Cli),
 }
 
 impl Cli {
     pub fn exec(&self) -> Result<()> {
         match &self.command {
-            Commands::GenerateKeypad(cli) => cli.create_pads(),
+            Commands::CreatePads(cli) => cli.create_pads(),
         }
     }
 }

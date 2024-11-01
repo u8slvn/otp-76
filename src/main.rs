@@ -1,5 +1,6 @@
 mod commands;
 mod otp;
+mod parsers;
 
 use anyhow::Result;
 use clap::Parser;
