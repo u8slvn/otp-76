@@ -15,12 +15,8 @@ pub struct Cli {
 impl Cli {
     pub fn create_pads(&self) -> Result<()> {
         let mut generator = otp::pad::PadGenerator::new();
-        let mut pad_collection = otp::pad::PadCollection::new();
-
-        for _ in 0..self.nb_pads {
-            let pad = generator.generate_pad(self.nb_keys);
-            pad_collection.add_pad(pad.unwrap());
-        }
+        let pads = generator.generate_pads(self.nb_pads, self.nb_keys).unwrap();
+        let pad_collection = otp::pad::PadCollection::new(pads);
 
         println!("{:?}", pad_collection);
         Ok(())
