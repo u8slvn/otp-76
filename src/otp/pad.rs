@@ -2,13 +2,15 @@
 //!
 //! This module contains the One Time Pad related functionality.
 
+use anyhow::Result;
 use rand::rngs::OsRng;
 use rand::Rng;
-use std::fmt;
+use serde::{Deserialize, Serialize};
 
 /// One Time Pad.
 ///
 /// This struct represents a One Time Pad.
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Pad {
     id: String,
     keys: Vec<u8>,
@@ -28,15 +30,6 @@ impl Pad {
 
     pub fn len(&self) -> usize {
         self.keys.len()
-    }
-}
-
-impl fmt::Debug for Pad {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Pad")
-            .field("id", &self.get_id())
-            .field("keys", &self.keys)
-            .finish()
     }
 }
 
@@ -75,6 +68,7 @@ impl PadGenerator {
 /// Pad collection.
 ///
 /// This struct represents a collection of pads.
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PadCollection {
     pads: Vec<Pad>,
 }
@@ -95,14 +89,19 @@ impl PadCollection {
     pub fn is_empty(&self) -> bool {
         self.pads.is_empty()
     }
-}
 
-impl fmt::Debug for PadCollection {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("PadCollection")
-            .field("count", &self.pads.len())
-            .field("pads", &self.pads)
-            .finish()
+    pub fn to_json(&self) -> Result<String> {
+        match serde_json::to_string(self) {
+            Ok(json) => Ok(json),
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    pub fn from_json(json: &str) -> Result<Self> {
+        match serde_json::from_str(json) {
+            Ok(collection) => Ok(collection),
+            Err(e) => Err(e.into()),
+        }
     }
 }
 
@@ -155,5 +154,21 @@ mod tests {
 
         assert!(collection.get_pad("12345").is_none());
         assert!(collection.is_empty());
+    }
+
+    #[test]
+    fn test_pad_collection_json() {
+        let pad1 = Pad::new("12345", vec![1, 2, 3, 4, 5]);
+        let pad2 = Pad::new("54321", vec![5, 4, 3, 2, 1]);
+        let collection = PadCollection::new(vec![pad1, pad2]);
+
+        let json = collection.to_json().unwrap();
+
+        let collection2 = PadCollection::from_json(&json).unwrap();
+
+        assert_eq!(collection2.get_pad("12345").unwrap().get_id(), "12345");
+        assert_eq!(collection2.get_pad("12345").unwrap().len(), 5);
+        assert_eq!(collection2.get_pad("54321").unwrap().get_id(), "54321");
+        assert_eq!(collection2.get_pad("54321").unwrap().len(), 5);
     }
 }

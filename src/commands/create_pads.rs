@@ -1,3 +1,4 @@
+use crate::file::write_file;
 use crate::otp;
 use crate::parsers::parse_int_arg;
 use anyhow::Result;
@@ -18,7 +19,11 @@ impl Cli {
         let pads = generator.generate_pads(self.nb_pads, self.nb_keys);
         let pad_collection = otp::pad::PadCollection::new(pads);
 
-        println!("{:?}", pad_collection);
+        match write_file("pads.json", &pad_collection.to_json()?) {
+            Ok(_) => println!("Pads created successfully"),
+            Err(e) => eprintln!("Failed to create pads: {}", e),
+        }
+
         Ok(())
     }
 }

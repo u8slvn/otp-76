@@ -1,4 +1,5 @@
 mod commands;
+mod file;
 mod otp;
 mod parsers;
 
