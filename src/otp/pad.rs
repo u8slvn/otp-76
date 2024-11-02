@@ -91,17 +91,11 @@ impl PadCollection {
     }
 
     pub fn to_json(&self) -> Result<String> {
-        match serde_json::to_string(self) {
-            Ok(json) => Ok(json),
-            Err(e) => Err(e.into()),
-        }
+        Ok(serde_json::to_string(self)?)
     }
 
     pub fn from_json(json: &str) -> Result<Self> {
-        match serde_json::from_str(json) {
-            Ok(collection) => Ok(collection),
-            Err(e) => Err(e.into()),
-        }
+        Ok(serde_json::from_str(json)?)
     }
 }
 
